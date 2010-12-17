@@ -1,46 +1,54 @@
 ;;; smart-tab.el --- Intelligent tab completion and indentation.
 
+;; This file is NOT part of GNU Emacs.
+
 ;; Copyright (C) 2009 Sebastien Rocca Serra,
 ;;                    Daniel Hackney
-
-;; Author: Sebastien Rocca Serra <sroccaserra@gmail.com>
+;; Author: Sebastien Rocca Serra <sroccaserra@gmail.com>,
 ;;         Daniel Hackney <dan@haxney.org>
 ;; Maintainer: Daniel Hackney <dan@haxney.org>
-;; Keywords: convenience abbrev
-;; Created: 24 May 2009
+;; Keywords: extensions
+;; Created: 2009-05-24
 ;; URL: http://github.com/chrono325/smart-tab/tree/master
 ;; Version: 0.3
+;;
+;; This program is free software; you can redistribute it and/or modify it under
+;; the terms of the GNU General Public License as published by the Free Software
+;; Foundation; either version 3, or (at your option) any later version.
+;;
+;; This program is distributed in the hope that it will be useful, but WITHOUT
+;; ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+;; FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+;; details.
+;;
+;; You should have received a copy of the GNU General Public License
+;; along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+;;; Commentary:
+
+;; INSTALL
+;;
+;; To install. put this file along your Emacs-Lisp `load-path' and add
+;; following into your ~/.emacs startup file or set
+;; `global-smart-tab-mode' to non-nil with curtomize:
+;;
+;;     (require 'smart-tab)
+;;     (global-smart-tab-mode 1)
+;;
+;; DESCRIPTION
+;;
+;; Try to 'do the smart thing' when tab is pressed. `smart-tab'
+;; attempts to expand the text before the point or indent the current
+;; line or selection.
+;;
+;; See <http://www.emacswiki.org/cgi-bin/wiki/TabCompletion#toc2>. There are a
+;; number of available customizations on that page.
+;;
 ;; Features that might be required by this library:
 ;;
 ;;   `easy-mmmode'
 
-
-;; This file is NOT part of GNU Emacs.
-
-;; This program is free software; you can redistribute it and/or modify it under
-;; the terms of the GNU General Public License as published by the Free Software
-;; Foundation; either version 3, or (at your option) any later version.
-
-;; This program is distributed in the hope that it will be useful, but WITHOUT
-;; ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-;; FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
-;; details.
-
-;; You should have received a copy of the GNU General Public License along with
-;; this program; see the file COPYING.  If not, write to the Free Software
-;; Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-
-;;; Commentary:
-;;
-;; From http://www.emacswiki.org/cgi-bin/wiki/TabCompletion#toc2. There are a
-;; number of available customizations on that page.
-;;
-;; To activate, add:
-;;     (require 'smart-tab)
-;;     (global-smart-tab-mode 1)
-;;
-;; to your .emacs file, or set `global-smart-tab-mode' to non-nil with
-;; customize.
+;;; Change Log:
 
 ;;; Code:
 
@@ -63,14 +71,14 @@ when we don't have to indent."
     (text-mode       . dabbrev-completion))
   "A-list of major modes in which to use a mode specific completion function.
 If current major mode is not found in this alist, fall back to
-hippie-expand or dabbrev-expand, depending on the value of
+`hippie-expand' or `dabbrev-expand', depending on the value of
 smart-tab-using-hippie-expand"
   :type '(alist :key-type (symbol :tag "Major mode")
                 :value-type (function :tag "Completion function to use in this mode"))
   :group 'smart-tab)
 
 (defcustom smart-tab-disabled-major-modes '(term-mode)
-  "List of major modes that should not use smart-tab"
+  "List of major modes that should not use smart-tab."
   :type 'sexp
   :group 'smart-tab)
 
@@ -92,7 +100,7 @@ Otherwise, uses `hippie-expand' or `dabbrev-expand' to expand the text at point.
     (looking-at "\\_>")))
 
 (defun smart-tab-default ()
-  "Indents region if mark is active, or current line otherwise."
+  "Indent region if mark is active, or current line otherwise."
   (interactive)
   (if mark-active
       (indent-region (region-beginning)
