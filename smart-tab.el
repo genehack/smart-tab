@@ -74,6 +74,31 @@ smart-tab-using-hippie-expand"
   :type 'sexp
   :group 'smart-tab)
 
+(defun smart-tab-call-completion-function ()
+  "Get a completion function according to current major mode."
+  (let ((completion-function
+         (cdr (assq major-mode smart-tab-completion-functions-alist))))
+    (if (null completion-function)
+        (if smart-tab-using-hippie-expand
+            (hippie-expand nil)
+          (dabbrev-expand nil))
+      (funcall completion-function))))
+
+(defun smart-tab-must-expand (&optional prefix)
+  "If PREFIX is \\[universal-argument] or the mark is active, do not expand.
+Otherwise, uses `hippie-expand' or `dabbrev-expand' to expand the text at point.."
+  (unless (or (consp prefix)
+              mark-active)
+    (looking-at "\\_>")))
+
+(defun smart-tab-default ()
+  "Indents region if mark is active, or current line otherwise."
+  (interactive)
+  (if mark-active
+      (indent-region (region-beginning)
+                     (region-end))
+    (indent-for-tab-command)))
+
 ;;;###autoload
 (defun smart-tab (prefix)
   "Try to 'do the smart thing' when tab is pressed.
@@ -87,33 +112,8 @@ or PREFIX is \\[universal-argument], then `smart-tab' will indent
 the region or the current line (if the mark is not active)."
   (interactive "P")
     (if (smart-tab-must-expand prefix)
-        (call-completion-function))
+        (smart-tab-call-completion-function))
       (smart-tab-default))
-
-(defun call-completion-function()
-  "Get a completion function according to current major mode."
-  (let ((completion-function
-         (cdr (assq major-mode smart-tab-completion-functions-alist))))
-    (if (null completion-function)
-        (if smart-tab-using-hippie-expand
-            (hippie-expand nil)
-          (dabbrev-expand nil))
-      (funcall completion-function))))
-
-(defun smart-tab-default ()
-  "Indents region if mark is active, or current line otherwise."
-  (interactive)
-  (if mark-active
-      (indent-region (region-beginning)
-                     (region-end))
-    (indent-for-tab-command)))
-
-(defun smart-tab-must-expand (&optional prefix)
-  "If PREFIX is \\[universal-argument] or the mark is active, do not expand.
-Otherwise, uses `hippie-expand' or `dabbrev-expand' to expand the text at point.."
-  (unless (or (consp prefix)
-              mark-active)
-    (looking-at "\\_>")))
 
 ;;;###autoload
 (defun smart-tab-mode-on ()
