@@ -98,7 +98,7 @@ the region or the current line (if the mark is not active)."
 (defun smart-tab-default ()
   "Indents region if mark is active, or current line otherwise."
   (interactive)
-  (if mark-active
+  (if (use-region-p)
       (indent-region (region-beginning)
                      (region-end))
     (indent-for-tab-command)))
@@ -107,7 +107,7 @@ the region or the current line (if the mark is not active)."
   "If PREFIX is \\[universal-argument] or the mark is active, do not expand.
 Otherwise, uses `hippie-expand' or `dabbrev-expand' to expand the text at point.."
   (unless (or (consp prefix)
-              mark-active)
+              (use-region-p))
     (looking-at "\\_>")))
 
 ;;;###autoload
