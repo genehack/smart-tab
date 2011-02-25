@@ -92,7 +92,7 @@ If current major mode is not found in this alist, fall back to
         (if (and (not (minibufferp))
                  (memq 'auto-complete-mode minor-mode-list)
                  auto-complete-mode)
-            (auto-complete)
+            (ac-start :force-init t)
           (if smart-tab-using-hippie-expand
               (hippie-expand nil)
             (dabbrev-expand nil)))
