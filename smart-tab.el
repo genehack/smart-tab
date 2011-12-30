@@ -56,8 +56,13 @@
 
 (require 'easy-mmode)
 
+(eval-when-compile
+  ;; Forward declaration, does not define variable
+  (defvar auto-complete-mode))
+
 (defgroup smart-tab nil
-  "Options for `smart-tab-mode'.")
+  "Options for `smart-tab-mode'."
+  :group 'tools)
 
 (defvar smart-tab-debug nil
   "Turn on for logging about which smart-tab function ends up being called.")
@@ -87,6 +92,14 @@ If current major mode is not found in this alist, fall back to
   :type 'sexp
   :group 'smart-tab)
 
+(put 'smart-tab-funcall 'lisp-indent-function 0)
+(put 'smart-tab-funcall 'edebug-form-spec '(body))
+(defmacro smart-tab-funcall (function &rest args)
+  "If FUNCTION is `fboundp' call it with ARGS."
+  `(let ((function ,function))
+     (if (fboundp function)
+	 (apply function ,@args nil))))
+
 (defun smart-tab-call-completion-function ()
   "Get a completion function according to current major mode."
   (if smart-tab-debug
@@ -96,8 +109,9 @@ If current major mode is not found in this alist, fall back to
     (if (null completion-function)
         (if (and (not (minibufferp))
                  (memq 'auto-complete-mode minor-mode-list)
+		 (boundp' auto-complete-mode)
                  auto-complete-mode)
-            (ac-start :force-init t)
+	    (smart-tab-funcall 'ac-start :force-init t)
           (if smart-tab-using-hippie-expand
               (hippie-expand nil)
             (dabbrev-expand nil)))
@@ -171,6 +185,8 @@ Null prefix argument turns off the mode."
           (smart-tab-mode-off)))))
 
 ;;;###autoload
+; Elint fix: Call to undefined function: global-smart-tab-mode-enable-in-buffers
+(autoload 'global-smart-tab-mode-enable-in-buffers "smart-tab")
 (define-globalized-minor-mode global-smart-tab-mode
   smart-tab-mode
   smart-tab-mode-on
