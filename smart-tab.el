@@ -87,7 +87,7 @@ If current major mode is not found in this alist, fall back to
                 :value-type (function :tag "Completion function to use in this mode"))
   :group 'smart-tab)
 
-(defcustom smart-tab-disabled-major-modes '(org-mode term-mode)
+(defcustom smart-tab-disabled-major-modes '(org-mode term-mode eshell-mode)
   "List of major modes that should not use `smart-tab'."
   :type 'sexp
   :group 'smart-tab)
