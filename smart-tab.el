@@ -106,16 +106,16 @@ If current major mode is not found in this alist, fall back to
       (message "complete"))
   (let ((completion-function
          (cdr (assq major-mode smart-tab-completion-functions-alist))))
-    (if (null completion-function)
-        (if (and (not (minibufferp))
-                 (memq 'auto-complete-mode minor-mode-list)
-                 (boundp' auto-complete-mode)
-                 auto-complete-mode)
-            (smart-tab-funcall 'ac-start :force-init t)
-          (if smart-tab-using-hippie-expand
-              (hippie-expand nil)
-            (dabbrev-expand nil)))
-      (funcall completion-function))))
+    (cond
+     (completion-function
+      (funcall completion-function))
+     ((and (not (minibufferp))
+           (memq 'auto-complete-mode minor-mode-list)
+           (boundp' auto-complete-mode)
+           auto-complete-mode)
+      (smart-tab-funcall 'ac-start :force-init t))
+     (t
+      (dabbrev-expand)))))
 
 (defun smart-tab-must-expand (&optional prefix)
   "If PREFIX is \\[universal-argument] or the mark is active, do not expand.
