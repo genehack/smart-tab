@@ -109,10 +109,12 @@ If current major mode is not found in this alist, fall back to
     (cond
      (completion-function
       (funcall completion-function))
-     ((and (not (minibufferp))
-           (memq 'auto-complete-mode minor-mode-list)
-           (boundp' auto-complete-mode)
-           auto-complete-mode)
+     ((minibufferp)
+      (minibuffer-complete))
+     ((and
+       (memq 'auto-complete-mode minor-mode-list)
+       (boundp' auto-complete-mode)
+       auto-complete-mode)
       (smart-tab-funcall 'ac-start :force-init t))
      (t
       (dabbrev-expand)))))
