@@ -58,7 +58,8 @@
 
 (eval-when-compile
   ;; Forward declaration, does not define variable
-  (defvar auto-complete-mode))
+  (defvar auto-complete-mode)
+  (defvar company-mode))
 
 (defgroup smart-tab nil
   "Options for `smart-tab-mode'."
@@ -111,6 +112,8 @@ If current major mode is not found in this alist, fall back to
       (funcall completion-function))
      ((minibufferp)
       (minibuffer-complete))
+     (company-mode
+      (company-complete))
      ((and
        (memq 'auto-complete-mode minor-mode-list)
        (boundp' auto-complete-mode)
