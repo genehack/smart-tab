@@ -155,7 +155,7 @@ active, or PREFIX is \\[universal-argument], then `smart-tab'
 will indent the region or the current line (if the mark is not
 active)."
   (interactive "P")
-  (if (smart-tab-must-expand prefix)
+  (if (or (smart-tab-must-expand prefix) (eolp))
       (smart-tab-call-completion-function)
     (smart-tab-default)))
 
