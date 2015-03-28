@@ -58,7 +58,8 @@
 
 (eval-when-compile
   ;; Forward declaration, does not define variable
-  (defvar auto-complete-mode))
+  (defvar auto-complete-mode)
+  (defvar company-mode))
 
 (defgroup smart-tab nil
   "Options for `smart-tab-mode'."
@@ -106,16 +107,20 @@ If current major mode is not found in this alist, fall back to
       (message "complete"))
   (let ((completion-function
          (cdr (assq major-mode smart-tab-completion-functions-alist))))
-    (if (null completion-function)
-        (if (and (not (minibufferp))
-                 (memq 'auto-complete-mode minor-mode-list)
-                 (boundp' auto-complete-mode)
-                 auto-complete-mode)
-            (smart-tab-funcall 'ac-start :force-init t)
-          (if smart-tab-using-hippie-expand
-              (hippie-expand nil)
-            (dabbrev-expand nil)))
-      (funcall completion-function))))
+    (cond
+     (completion-function
+      (funcall completion-function))
+     ((minibufferp)
+      (minibuffer-complete))
+     (company-mode
+      (company-complete))
+     ((and
+       (memq 'auto-complete-mode minor-mode-list)
+       (boundp' auto-complete-mode)
+       auto-complete-mode)
+      (smart-tab-funcall 'ac-start :force-init t))
+     (t
+      (dabbrev-expand)))))
 
 (defun smart-tab-must-expand (&optional prefix)
   "If PREFIX is \\[universal-argument] or the mark is active, do not expand.
@@ -150,7 +155,7 @@ active, or PREFIX is \\[universal-argument], then `smart-tab'
 will indent the region or the current line (if the mark is not
 active)."
   (interactive "P")
-  (if (smart-tab-must-expand prefix)
+  (if (or (smart-tab-must-expand prefix) (eolp))
       (smart-tab-call-completion-function)
     (smart-tab-default)))
 
