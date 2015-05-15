@@ -133,7 +133,16 @@ the text at point."
   (if (use-region-p)
       (indent-region (region-beginning)
                      (region-end))
-    (indent-for-tab-command)))
+    (let* ((smart-tab-mode nil)
+           (global-smart-tab-mode nil)
+           (ev last-command-event)
+           (triggering-key (cl-case (type-of ev)
+                             (integer (char-to-string ev))
+                             (symbol (vector ev))))
+           (original-func (or (key-binding triggering-key)
+                              'indent-for-tab-command)))
+      (call-interactively original-func))))
+
 
 ;;;###autoload
 (defun smart-tab (&optional prefix)
