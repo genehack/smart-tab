@@ -133,7 +133,16 @@ the text at point."
   (if (use-region-p)
       (indent-region (region-beginning)
                      (region-end))
-    (indent-for-tab-command)))
+    (let* ((smart-tab-mode nil)
+           (global-smart-tab-mode nil)
+           (ev last-command-event)
+           (triggering-key (cl-case (type-of ev)
+                             (integer (char-to-string ev))
+                             (symbol (vector ev))))
+           (original-func (or (key-binding triggering-key)
+                              'indent-for-tab-command)))
+      (call-interactively original-func))))
+
 
 ;;;###autoload
 (defun smart-tab (&optional prefix)
@@ -151,7 +160,7 @@ will indent the region or the current line (if the mark is not
 active)."
   (interactive "P")
   (if (smart-tab-must-expand prefix)
-      (smart-tab-call-completion-function)
+      (or (smart-tab-call-completion-function) (smart-tab-default))
     (smart-tab-default)))
 
 ;;;###autoload
