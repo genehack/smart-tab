@@ -168,8 +168,7 @@ active)."
    ;; available, fall back to default behavior. (Avoids hitting TAB at
    ;; the end of a line without visible effect.)
    ((smart-tab-must-expand prefix)
-    (or (smart-tab-call-completion-function)
-        (smart-tab-default)))
+    (smart-tab-call-completion-function))
    (t
     (smart-tab-default))))
 
