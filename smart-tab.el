@@ -164,9 +164,6 @@ active)."
    ((use-region-p)
     (indent-region (region-beginning)
                    (region-end)))
-   ;; If we decide we should try expansion but then no expansion is
-   ;; available, fall back to default behavior. (Avoids hitting TAB at
-   ;; the end of a line without visible effect.)
    ((smart-tab-must-expand prefix)
     (smart-tab-call-completion-function))
    (t
